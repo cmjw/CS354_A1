@@ -227,6 +227,20 @@ void RayTracer::traceImage(int w, int h)
 	//       while rendering.
 	//
 	// This will require you to work with pthreads and queuing which is more involved, though
+
+	// for each pixel i,j in image
+	// 	S = PointInPixel
+	//  P = CameraOrigin
+	//  d = (S-P)/|S-P|
+	//  I(i,j) = traceRay(scene, P, d)
+
+	traceSetup(w, h);
+	
+	for (int r = 0; r < w; r++) {
+		for (int c = 0; c < h; c++) {
+			tracePixel(r, c);
+		}
+	}
 }
 
 
