@@ -1,4 +1,6 @@
 // The main ray tracer.
+// Charlotte White
+// cmw4856
 
 #pragma warning (disable: 4786)
 
@@ -26,7 +28,7 @@ extern TraceUI* traceUI;
 // Use this variable to decide if you want to print out
 // debugging messages.  Gets set in the "trace single ray" mode
 // in TraceGLWindow, for example.
-bool debugMode = false;
+bool debugMode = true;
 
 // Trace a top-level ray through pixel(i,j), i.e. normalized window coordinates (x,y),
 // through the projection plane, and out into the scene.  All we do is
@@ -79,9 +81,8 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 	std::cerr << "== current depth: " << depth << std::endl;
 #endif
 
+	// intersect object
 	if(scene->intersect(r, i)) {
-		// YOUR CODE HERE
-
 		// An intersection occurred!  We've got work to do.  For now,
 		// this code gets the material for the surface that was intersected,
 		// and asks that material to provide a color for the ray.
@@ -93,6 +94,55 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 
 		const Material& m = i.getMaterial();
 		colorC = m.shade(scene.get(), r, i);
+
+		//glm::dvec3 ambientLight = scene.ambientLight();
+
+		//int lights = scene.lights;
+
+		if (depth < 0) { // recursion base case
+			return glm::dvec3(0.0, 0.0, 0.0);
+		}
+
+		// P: ray origin
+		// Q: point based on P
+		// d: diretion
+		// L: shadow direction
+		// R: reflection direction
+		// T: refraction direction
+
+		glm::dvec3 Q = r.at(i.getT());
+		glm::dvec3 d = -1.0 * r.getDirection();
+		glm::dvec3 N = i.getN();
+		t = i.getT();
+		double t_reflect = 0;
+		glm::dvec3 kr = m.kr(i);
+		glm::dvec3 kt = m.kt(i);
+
+		glm::dvec3 wReflect = glm::dvec3(1, 1, 1);
+
+		int insideObject = glm::dot(d, N) < 0;
+
+		
+
+		// Reflection
+		if (!insideObject && kr[0] > 0 || kr[1] > 0 || kr[2] > 0) { // kr / reflection vector is non zero
+			if (debugMode) {
+				
+			}
+
+			glm::dvec3 p = r.at(i) + RAY_EPSILON * N;
+			glm::dvec3 reflectedDirection = 2.0 * glm::dot(d, N) * N - d;
+
+			ray reflectedRay = ray(p, reflectedDirection, wReflect, ray::REFLECTION);
+	
+			colorC += kr * traceRay(reflectedRay, thresh, depth - 1, t_reflect);
+		}
+
+		// Refraction
+		if (!insideObject && kt[0] > 0 || kt[1] > 0 || kt[2] > 0) {
+
+		}
+
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case

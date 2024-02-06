@@ -45,7 +45,40 @@ glm::dvec3 Material::shade(Scene* scene, const ray& r, const isect& i) const
 	// 		.
 	// 		.
 	// }
-	return kd(i);
+
+	glm::dvec3 Q = r.at(i.getT());
+	glm::dvec3 I = ke(i) + ka(i) * scene->ambient();
+
+	glm::dvec3 isect = r.at(i.getT());
+
+	glm::dvec3 color = glm::dvec3(0, 0, 0);
+
+	for (const auto& pLight : scene->getAllLights()) {
+		// Light has type unique_ptr<Light>
+		glm::dvec3 attenuation = pLight->distanceAttenuation(Q) * pLight->shadowAttenuation(r, Q);
+		double direction = dot(pLight->getDirection(Q), i.getN());
+
+		// I += attenuation * (diffuse term + spec term)
+		glm::dvec3 Ii = pLight->getColor();
+		
+		// diffuse term : kd * Ii max(L dot N, 0)
+		double L = dot(pLight->getDirection(isect), i.getN());
+
+		glm::dvec3 diffuse = kd(i) * Ii * max(L, 0.0);
+
+		// spec term : ks Ii max(R dot V, 0) ^ n
+		glm::dvec3 ri = -1.0 * pLight->getDirection(isect);
+		glm::dvec3 R = ri - (2.0 * i.getN() * glm::dot(ri, i.getN()));
+		glm::dvec3 V = -1.0 * r.getDirection();
+
+		glm::dvec3 spec = ks(i) * Ii * max(glm::dot(R, V), 0.0);
+		//glm::dvec3 spec = ks(i) * Ii * pow(max(glm::dot(R, V), 0.0), glm::normalize(i.getN()));
+
+		I += attenuation * (diffuse + spec);
+	}
+
+	return I;
+	//return kd(i);
 }
 
 TextureMap::TextureMap(string filename)

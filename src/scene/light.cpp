@@ -19,6 +19,17 @@ glm::dvec3 DirectionalLight::shadowAttenuation(const ray& r, const glm::dvec3& p
 {
 	// YOUR CODE HERE:
 	// You should implement shadow-handling code here.
+
+	// 4th arg?
+	ray originToDirectionalLight = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
+
+	isect i;
+
+	// ray from origin to light intersects an object
+	if (scene->intersect(originToDirectionalLight, i)) {
+		return glm::dvec3(0, 0, 0);
+	}
+
 	return glm::dvec3(1.0, 1.0, 1.0);
 }
 
@@ -58,6 +69,14 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 {
 	// YOUR CODE HERE:
 	// You should implement shadow-handling code here.
+
+	ray originToDirectionalLight = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
+	isect i;
+
+	if (scene->intersect(originToDirectionalLight, i)) {
+		return glm::dvec3(0.0, 0.0, 0.0);
+	}	
+
 	return glm::dvec3(1,1,1);
 }
 
