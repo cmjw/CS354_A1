@@ -70,6 +70,8 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 	// YOUR CODE HERE:
 	// You should implement shadow-handling code here.
 
+	//ray d = glm::normalize((r.getPosition() - p));
+
 	ray originToDirectionalLight = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
 	isect i;
 
@@ -77,7 +79,7 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 		return glm::dvec3(0.0, 0.0, 0.0);
 	}	
 
-	return glm::dvec3(1,1,1);
+	return glm::dvec3(1.0, 1.0, 1.0);
 }
 
 #define VERBOSE 0

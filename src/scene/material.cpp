@@ -58,7 +58,6 @@ glm::dvec3 Material::shade(Scene* scene, const ray& r, const isect& i) const
 		glm::dvec3 attenuation = pLight->distanceAttenuation(Q) * pLight->shadowAttenuation(r, Q);
 		double direction = dot(pLight->getDirection(Q), i.getN());
 
-		// I += attenuation * (diffuse term + spec term)
 		glm::dvec3 Ii = pLight->getColor();
 		
 		// diffuse term : kd * Ii max(L dot N, 0)
@@ -71,8 +70,11 @@ glm::dvec3 Material::shade(Scene* scene, const ray& r, const isect& i) const
 		glm::dvec3 R = ri - (2.0 * i.getN() * glm::dot(ri, i.getN()));
 		glm::dvec3 V = -1.0 * r.getDirection();
 
-		glm::dvec3 spec = ks(i) * Ii * max(glm::dot(R, V), 0.0);
-		//glm::dvec3 spec = ks(i) * Ii * pow(max(glm::dot(R, V), 0.0), glm::normalize(i.getN()));
+		//glm::dvec3 spec = ks(i) * Ii * max(glm::dot(R, V), 0.0);
+
+		double n = shininess(i);
+		// issue with spectral coeffiient
+		glm::dvec3 spec = ks(i) * Ii * pow (max(glm::dot(R, V), 0.0), n);
 
 		I += attenuation * (diffuse + spec);
 	}
