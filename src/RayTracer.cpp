@@ -95,10 +95,6 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		const Material& m = i.getMaterial();
 		colorC = m.shade(scene.get(), r, i);
 
-		//glm::dvec3 ambientLight = scene.ambientLight();
-
-		//int lights = scene.lights;
-
 		if (depth < 0) { // recursion base case
 			return glm::dvec3(0.0, 0.0, 0.0);
 		}
@@ -120,12 +116,10 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 
 		glm::dvec3 wReflect = glm::dvec3(1, 1, 1);
 
-		int insideObject = glm::dot(d, N) < 0;
-
-		
+		bool insideObject = glm::dot(d, N) < 0;
 
 		// Reflection
-		if (!insideObject && kr[0] > 0 || kr[1] > 0 || kr[2] > 0) { // kr / reflection vector is non zero
+		if (!insideObject && (kr[0] > 0 || kr[1] > 0 || kr[2] > 0)) { // kr / reflection vector is non zero
 			if (debugMode) {
 				
 			}
