@@ -107,7 +107,7 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		// T: refraction direction
 
 		glm::dvec3 Q = r.at(i.getT());
-		glm::dvec3 d = -1.0 * r.getDirection();
+		glm::dvec3 l = -1.0 * r.getDirection();
 		glm::dvec3 N = i.getN();
 		t = i.getT();
 		double t_reflect = 0;
@@ -116,16 +116,18 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 
 		glm::dvec3 wReflect = glm::dvec3(1, 1, 1);
 
-		bool insideObject = glm::dot(d, N) < 0;
+		bool insideObject = glm::dot(l, N) < 0;
 
 		// Reflection
-		if (!insideObject && (kr[0] > 0 || kr[1] > 0 || kr[2] > 0)) { // kr / reflection vector is non zero
+		// r = 2 (l dot n) n - 1
+
+		if (m.Refl()) { // kr / reflection vector is non zero
 			if (debugMode) {
 				
 			}
-
 			glm::dvec3 p = r.at(i) + RAY_EPSILON * N;
-			glm::dvec3 reflectedDirection = 2.0 * glm::dot(d, N) * N - d;
+
+			glm::dvec3 reflectedDirection = 2.0 * glm::dot(l, N) * N - l;
 
 			ray reflectedRay = ray(p, reflectedDirection, wReflect, ray::REFLECTION);
 	
@@ -133,8 +135,8 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		}
 
 		// Refraction
-		if (!insideObject && kt[0] > 0 || kt[1] > 0 || kt[2] > 0) {
-
+		if (!insideObject && m.Trans()) {
+			
 		}
 
 	} else {

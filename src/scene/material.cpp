@@ -56,6 +56,7 @@ glm::dvec3 Material::shade(Scene* scene, const ray& r, const isect& i) const
 	for (const auto& pLight : scene->getAllLights()) {
 		// Light has type unique_ptr<Light>
 		glm::dvec3 attenuation = pLight->distanceAttenuation(Q) * pLight->shadowAttenuation(r, Q);
+		
 		double direction = dot(pLight->getDirection(Q), i.getN());
 
 		glm::dvec3 Ii = pLight->getColor();

@@ -75,9 +75,10 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 	ray originToDirectionalLight = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
 	isect i;
 
-	if (scene->intersect(originToDirectionalLight, i)) {
-		return glm::dvec3(0.0, 0.0, 0.0);
-	}	
+	// THERE IS SOMETHING WRONG HERE
+	// if (scene->intersect(originToDirectionalLight, i)) {
+	// 	return glm::dvec3(0.0, 0.0, 0.0);
+	// }	
 
 	return glm::dvec3(1.0, 1.0, 1.0);
 }
