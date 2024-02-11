@@ -113,8 +113,28 @@ bool TrimeshFace::intersectLocal(ray& r, isect& i) const
 
 	//double b1 = N * glm::cross((b-a), (q-a));
 
+	glm::dvec3 bary1 = glm::cross((b - a), (q - a));
+	glm::dvec3 bary2 = glm::cross((c - b), (q - b));
+	glm::dvec3 bary3 = glm::cross((a - c), (q - c));
 
-	return false;
+	if (glm::dot(N, bary1) < 0 || glm::dot(N, bary2) < 0 || glm::dot(N, bary3) < 0) {
+		return false;
+		// no intersection
+	}
+
+	double u = glm::length(bary2) / glm::length(N);
+	double v = glm::length(bary3) / glm::length(N);
+
+	glm::dvec3 bary;
+	bary.x = u;
+	bary.y = v;
+	bary.z = 1.0 - u - v;
+
+	i.setBary(bary);
+
+	
+
+	return true;
 }
 
 // Once all the verts and faces are loaded, per vertex normals can be
