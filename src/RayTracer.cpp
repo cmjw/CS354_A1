@@ -22,6 +22,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <omp.h>
+
 using namespace std;
 extern TraceUI* traceUI;
 
@@ -121,7 +123,7 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		// Reflection
 		// r = 2 (l dot n) n - 1
 
-		if (m.Refl()) { // kr / reflection vector is non zero
+		if (m.Refl() && !insideObject) { // kr / reflection vector is non zero
 			if (debugMode) {
 				
 			}
@@ -135,8 +137,12 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		}
 
 		// Refraction
-		if (!insideObject && m.Trans()) {
-			
+		if (m.Trans()) {
+			double refractionIndex;
+
+			if (insideObject) {
+				
+			}
 		}
 
 	} else {
@@ -281,11 +287,14 @@ void RayTracer::traceImage(int w, int h)
 	//  I(i,j) = traceRay(scene, P, d)
 
 	traceSetup(w, h);
-	
+
+	#pragma omp parallel
+	{
 	for (int r = 0; r < w; r++) {
 		for (int c = 0; c < h; c++) {
 			tracePixel(r, c);
 		}
+	}
 	}
 }
 

@@ -509,7 +509,8 @@ src/CMakeFiles/ray.dir/RayTracer.cpp.o: ../src/RayTracer.cpp \
   /usr/include/c++/11/fstream \
   /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
   /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
-  /usr/include/c++/11/bits/fstream.tcc
+  /usr/include/c++/11/bits/fstream.tcc \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h
 
 src/CMakeFiles/ray.dir/SceneObjects/Box.cpp.o: ../src/SceneObjects/Box.cpp \
   /usr/include/stdc-predef.h \
@@ -12062,6 +12063,8 @@ src/CMakeFiles/ray.dir/ui/glObjects.cpp.o: ../src/ui/glObjects.cpp \
 
 /usr/include/x86_64-linux-gnu/asm/posix_types.h:
 
+/usr/include/linux/stddef.h:
+
 /usr/local/include/glm/mat3x2.hpp:
 
 /usr/local/include/glm/detail/type_mat2x4.hpp:
@@ -12222,7 +12225,7 @@ src/CMakeFiles/ray.dir/ui/glObjects.cpp.o: ../src/ui/glObjects.cpp \
 
 /usr/include/c++/11/bits/refwrap.h:
 
-/usr/include/linux/stddef.h:
+/usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h:
 
 /usr/include/c++/11/climits:
 

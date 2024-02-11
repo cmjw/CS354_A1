@@ -511,6 +511,7 @@ src/CMakeFiles/ray.dir/RayTracer.cpp.o
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h
  /usr/include/c++/11/bits/fstream.tcc
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h
 
 src/CMakeFiles/ray.dir/SceneObjects/Box.cpp.o
  /home/zuzana/Documents/CS_354/ray/src/SceneObjects/Box.cpp

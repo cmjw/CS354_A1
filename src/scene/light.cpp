@@ -72,13 +72,43 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 
 	//ray d = glm::normalize((r.getPosition() - p));
 
-	ray originToDirectionalLight = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
-	isect i;
+	//ray originToDirectionalLight = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
+	//isect i;
 
 	// THERE IS SOMETHING WRONG HERE
 	// if (scene->intersect(originToDirectionalLight, i)) {
 	// 	return glm::dvec3(0.0, 0.0, 0.0);
-	// }	
+	// }
+
+	isect i;
+	ray originToPointLight = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
+
+	glm::dvec3 d = glm::normalize(getDirection(p) - p);	
+
+	glm::dvec3 q = originToPointLight.at(i.getT());
+
+	double qLen = glm::distance(p, q);
+	double lightLen = glm::distance(p, position);
+
+	// double dis = (p - q).length();
+	// double disToPosition = (position - p).length();
+
+	// if (!scene->intersect(originToPointLight, i)) {
+	// 	return glm::dvec3(1,1,1);
+	// }
+
+
+
+	// (qLen < lightLen)
+	if (scene->intersect(originToPointLight, i) && (qLen < lightLen)) {
+		// in shadow
+
+		//glm::dvec3 kt = i.material.kt(i);
+
+		//glm::dvec3 Iq = shadowAttenuation(r, q);
+
+		return glm::dvec3(0, 0, 0);
+	}
 
 	return glm::dvec3(1.0, 1.0, 1.0);
 }
