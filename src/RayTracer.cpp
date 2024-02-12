@@ -120,6 +120,8 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 
 		bool insideObject = glm::dot(l, N) < 0;
 
+		bool enteringObject = glm::dot(glm::normalize(r.getDirection()), glm::normalize(i.getN())) < 0;
+
 		// Reflection
 		// r = 2 (l dot n) n - 1
 
@@ -137,12 +139,30 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		}
 
 		// Refraction
-		if (m.Trans()) {
-			double refractionIndex;
 
-			if (insideObject) {
-				
-			}
+		double n_i, n_t;
+		double indexOfAir = 1.0;
+
+		if (enteringObject) {
+			n_i = indexOfAir;
+			n_t = m.index(i);
+		}
+			
+		else if (!enteringObject) {
+			n_i = m.index(i);
+			n_t = indexOfAir;
+		}
+
+		double TIR = 1.0 - (glm::pow(n_i / n_t, 2) * (1.0 - glm::pow( glm::dot(N, r.getDirection()), 2) ) );
+
+		bool ktGTZ = (m.kt(i)[0] > 0) && (m.kt(i)[1] > 0) && (m.kt(i)[2] > 0);
+
+		if (ktGTZ && TIR < 0) {
+			glm::dvec3 refractedDirection = glm::normalize(glm::refract(r.getDirection(), N, n_i / n_t));
+
+			ray refractedRay = ray(Q, refractedDirection, glm::dvec3(0, 0, 0), ray::REFRACTION);
+
+			colorC += m.kt(i) * traceRay(refractedRay, thresh, depth - 1, t_reflect);
 		}
 
 	} else {

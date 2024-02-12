@@ -107,7 +107,7 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 
 		//glm::dvec3 Iq = shadowAttenuation(r, q);
 
-		return glm::dvec3(0, 0, 0);
+		//return glm::dvec3(0, 0, 0);
 	}
 
 	return glm::dvec3(1.0, 1.0, 1.0);
