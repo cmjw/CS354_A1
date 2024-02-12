@@ -85,6 +85,10 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 
 	// intersect object
 	if(scene->intersect(r, i)) {
+
+		if (debugMode) {
+			std::cout << "INTERSECTION" << std::endl;
+		}
 		// An intersection occurred!  We've got work to do.  For now,
 		// this code gets the material for the surface that was intersected,
 		// and asks that material to provide a color for the ray.
@@ -93,6 +97,11 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		// Instead of just returning the result of shade(), add some
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
+
+		if (traceUI->cubeMap()) {
+			// CubeMap
+			//return traceUI->getCubeMap()->getColor(r);
+		}
 
 		const Material& m = i.getMaterial();
 		colorC = m.shade(scene.get(), r, i);
