@@ -106,13 +106,36 @@ glm::dvec3 TextureMap::getMappedValue(const glm::dvec2& coord) const
 	// and use these to perform bilinear interpolation
 	// of the values.
 
-	double x = (width - 1) * coord[0];
-	double y = (height - 1) * coord[1];
+	double w = (double) getWidth();
+	double h = (double) getHeight();
 
-	int X = int(x);
-	int Y = int(y);
+	double u = coord.x * w - 1;
+	double v = coord.y * h - 1;
 
+	double fu = floor(u);
+	double cu = fu + 1;
+	
+	double fv = floor(v);
+	double cv = fv + 1;
 
+	glm::dvec2 upperLeft  (fu, cv);
+	glm::dvec2 upperRight (cu, cv);
+	glm::dvec2 lowerLeft  (fu, fv);
+	glm::dvec2 lowerRight (cu, fv);
+
+	// bilinear interpolation
+	glm::dvec3 q11 = getPixelAt( (int) upperLeft.x,  (int) upperLeft.y );
+	glm::dvec3 q12 = getPixelAt( (int) upperRight.x, (int) upperRight.y );
+	glm::dvec3 q21 = getPixelAt( (int) lowerLeft.x,  (int) lowerLeft.y );
+	glm::dvec3 q22 = getPixelAt( (int) lowerRight.x, (int) lowerRight.y );
+
+	glm::dvec3 r1 = ( (lowerRight.x - u) / (lowerRight.x - lowerLeft.x) ) * q11 + ( (u - lowerLeft.x) / (lowerRight.x - lowerLeft.x) ) * q21;
+
+	glm::dvec3 r2 = ( (upperRight.x - u) / (upperRight.x - upperLeft.x) ) * q12 + ( (u - upperLeft.x) / (upperRight.x - upperLeft.x) ) * q22;
+
+	glm::dvec3 colorC = ( (upperLeft.y - v) / (upperLeft.y - lowerLeft.y) ) * r1 + ( (v - lowerLeft.x) / (upperLeft.x - lowerLeft.x) ) * r2;
+
+	return colorC;
 
 	return glm::dvec3(1, 1, 1);
 }
