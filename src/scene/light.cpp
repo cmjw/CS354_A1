@@ -49,8 +49,11 @@ double PointLight::distanceAttenuation(const glm::dvec3& P) const
 	// of the light based on the distance between the source and the 
 	// point P.  For now, we assume no attenuation and just return 1.0
 
+	double d = glm::distance(P, position);
 
-	return 1.0;
+	double atten = 1.0 / (constantTerm + linearTerm * d + quadraticTerm * (d * d));
+
+	return glm::min(1.0, atten);
 }
 
 glm::dvec3 PointLight::getColor() const
@@ -69,17 +72,32 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 	// YOUR CODE HERE:
 	// You should implement shadow-handling code here.
 
-	// glm::dvec3 d = glm::normalize((r.getPosition() - p));
-	// isect i;
+	std::cout << "Point Light Shadow Attenuation" << std::endl;
 
-	// ray shadowRay = ray(p, d, glm::dvec3(1, 1, 1), ray::SHADOW);
+	glm::dvec3 d = glm::normalize((r.getPosition() - p));
+	isect i;
 
-	// if (!(scene->intersect(shadowRay, i))) {
-	// 	// no intersection, no shadow
-	// 	return glm::dvec3(1, 1, 1);
-	// }
+	ray shadowRay = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
 
-	return glm::dvec3(1,1,1);
+	if (!(scene->intersect(shadowRay, i))) {
+		// no intersection, no shadow
+		std::cout << "No intersection" << std::endl;
+
+		return glm::dvec3(1, 1, 1);
+	}
+
+	glm::dvec3 Q = shadowRay.at(i.getT());
+
+	double qLen = glm::distance(p, Q);
+	double lightLen = glm::distance(p, position);
+
+	std::cout << "q and light" << qLen << " " << lightLen << std::endl;
+
+	if (qLen < lightLen) {
+		return glm::dvec3(0, 0, 0);
+	}
+
+	return glm::dvec3(1, 1, 1);
 }
 
 #define VERBOSE 0
