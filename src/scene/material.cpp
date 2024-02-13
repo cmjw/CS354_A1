@@ -105,7 +105,50 @@ glm::dvec3 TextureMap::getMappedValue(const glm::dvec2& coord) const
 	// and use these to perform bilinear interpolation
 	// of the values.
 
-	return glm::dvec3(1, 1, 1);
+	/*
+	* I used this site as a reference to better understand the math 
+	* behind linear interpolation: https://x-engineer.org/bilinear-interpolation/ .
+	*/
+
+	// bilinear interpolation
+
+	double u = coord.x * getWidth() - 1;
+	double v = coord.y * getHeight() - 1;
+
+	// round down
+	double fu = floor(u);
+	double cu = fu + 1.0;
+
+	double fv = floor(v);
+	double cv = fv + 1.0;
+
+	glm::dvec2 upperLeft  (fu, cv); 
+	glm::dvec2 upperRight (cu, cv);
+	glm::dvec2 lowerLeft  (fu, fv);
+	glm::dvec2 lowerRight (cu, fv);
+
+	// x = u, y = v
+	double x1 = lowerLeft.x;
+	double x2 = lowerRight.x;
+
+	double y1 = lowerLeft.y;
+	double y2 = upperLeft.y;
+
+	glm::dvec3 Q12 = getPixelAt( (int) x1, (int) y2);
+	glm::dvec3 Q22 = getPixelAt( (int) x2, (int) y2);
+	glm::dvec3 Q11 = getPixelAt( (int) x1, (int) y1);
+	glm::dvec3 Q21 = getPixelAt( (int) x2, (int) y1);
+
+	// generate points
+	glm::dvec3 R1 = Q11 * (x2 - u) / (x2 - x1) + Q21 * (u - x1) / (x2 - x1);
+	glm::dvec3 R2 = Q12 * (x2 - u) / (x2 - x1) + Q22 * (u - x1) / (x2 - x1);
+
+	// interpolated point
+	glm::dvec3 P = R1 * (y2 - v) / (y2 - y1) + R2 * (v - y1) / (y2 - y1);
+
+	return P;
+
+	//return glm::dvec3(1, 1, 1);
 }
 
 glm::dvec3 TextureMap::getPixelAt(int x, int y) const
@@ -115,7 +158,17 @@ glm::dvec3 TextureMap::getPixelAt(int x, int y) const
 	// In order to add texture mapping support to the
 	// raytracer, you need to implement this function.
 
-	return glm::dvec3(1, 1, 1);
+	int X = x >= width ? -x : x;
+	int Y = y >= height ? -y : y;
+
+	int pos = 3 * (y * width + x);
+
+	glm::dvec3 pixel (data[pos], data[pos + 1], data[pos + 2]);
+	pixel /= 255.0;
+
+	return pixel;
+
+	//return glm::dvec3(1, 1, 1);
 }
 
 glm::dvec3 MaterialParameter::value(const isect& is) const

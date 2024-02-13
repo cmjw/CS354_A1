@@ -107,7 +107,7 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		// reflection
 		if (m.Refl()) {
 			if (debugMode) {
-				std::cout << "Reflection" << endl;
+				//std::cout << "Reflection" << endl;
 			}
 			glm::dvec3 p = r.at(i) + RAY_EPSILON * N;
 
@@ -165,6 +165,12 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		// TIPS: CubeMap object can be fetched from traceUI->getCubeMap();
 		//       Check traceUI->cubeMap() to see if cubeMap is loaded
 		//       and enabled.
+
+		if (traceUI->cubeMap()) {
+			if (debugMode) { std::cout << "Have cubeMap" << endl; }
+
+			return traceUI->getCubeMap()->getColor(r);
+		}
 
 		colorC = glm::dvec3(0.0, 0.0, 0.0);
 	}
