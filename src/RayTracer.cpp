@@ -1,6 +1,4 @@
 // The main ray tracer.
-// Charlotte White
-// cmw4856
 
 #pragma warning (disable: 4786)
 
@@ -22,15 +20,13 @@
 #include <iostream>
 #include <fstream>
 
-#include <omp.h>
-
 using namespace std;
 extern TraceUI* traceUI;
 
 // Use this variable to decide if you want to print out
 // debugging messages.  Gets set in the "trace single ray" mode
 // in TraceGLWindow, for example.
-bool debugMode = true;
+bool debugMode = false;
 
 // Trace a top-level ray through pixel(i,j), i.e. normalized window coordinates (x,y),
 // through the projection plane, and out into the scene.  All we do is
@@ -71,7 +67,7 @@ glm::dvec3 RayTracer::tracePixel(int i, int j)
 	return col;
 }
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
 // (or places called from here) to handle reflection, refraction, etc etc.
@@ -83,12 +79,9 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 	std::cerr << "== current depth: " << depth << std::endl;
 #endif
 
-	// intersect object
 	if(scene->intersect(r, i)) {
+		// YOUR CODE HERE
 
-		if (debugMode) {
-			std::cout << "INTERSECTION" << std::endl;
-		}
 		// An intersection occurred!  We've got work to do.  For now,
 		// this code gets the material for the surface that was intersected,
 		// and asks that material to provide a color for the ray.
@@ -98,82 +91,8 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
 
-		if (traceUI->cubeMap()) {
-			// CubeMap
-			//return traceUI->getCubeMap()->getColor(r);
-		}
-
 		const Material& m = i.getMaterial();
 		colorC = m.shade(scene.get(), r, i);
-
-		if (depth < 0) { // recursion base case
-			return glm::dvec3(0.0, 0.0, 0.0);
-		}
-
-		// P: ray origin
-		// Q: point based on P
-		// d: diretion
-		// L: shadow direction
-		// R: reflection direction
-		// T: refraction direction
-
-		glm::dvec3 Q = r.at(i.getT());
-		glm::dvec3 l = -1.0 * r.getDirection();
-		glm::dvec3 N = i.getN();
-		t = i.getT();
-		double t_reflect = 0;
-		glm::dvec3 kr = m.kr(i);
-		glm::dvec3 kt = m.kt(i);
-
-		glm::dvec3 wReflect = glm::dvec3(1, 1, 1);
-
-		bool insideObject = glm::dot(l, N) < 0;
-
-		bool enteringObject = glm::dot(glm::normalize(r.getDirection()), glm::normalize(i.getN())) < 0;
-
-		// Reflection
-		// r = 2 (l dot n) n - 1
-
-		if (m.Refl() && !insideObject) { // kr / reflection vector is non zero
-			if (debugMode) {
-				
-			}
-			glm::dvec3 p = r.at(i) + RAY_EPSILON * N;
-
-			glm::dvec3 reflectedDirection = 2.0 * glm::dot(l, N) * N - l;
-
-			ray reflectedRay = ray(p, reflectedDirection, wReflect, ray::REFLECTION);
-	
-			colorC += kr * traceRay(reflectedRay, thresh, depth - 1, t_reflect);
-		}
-
-		// Refraction
-
-		double n_i, n_t;
-		double indexOfAir = 1.0;
-
-		if (enteringObject) {
-			n_i = indexOfAir;
-			n_t = m.index(i);
-		}
-			
-		else if (!enteringObject) {
-			n_i = m.index(i);
-			n_t = indexOfAir;
-		}
-
-		double TIR = 1.0 - (glm::pow(n_i / n_t, 2) * (1.0 - glm::pow( glm::dot(N, r.getDirection()), 2) ) );
-
-		bool ktGTZ = (m.kt(i)[0] > 0) && (m.kt(i)[1] > 0) && (m.kt(i)[2] > 0);
-
-		if (ktGTZ && TIR < 0) {
-			glm::dvec3 refractedDirection = glm::normalize(glm::refract(r.getDirection(), N, n_i / n_t));
-
-			ray refractedRay = ray(Q, refractedDirection, glm::dvec3(0, 0, 0), ray::REFRACTION);
-
-			colorC += m.kt(i) * traceRay(refractedRay, thresh, depth - 1, t_reflect);
-		}
-
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
@@ -309,21 +228,12 @@ void RayTracer::traceImage(int w, int h)
 	//
 	// This will require you to work with pthreads and queuing which is more involved, though
 
-	// for each pixel i,j in image
-	// 	S = PointInPixel
-	//  P = CameraOrigin
-	//  d = (S-P)/|S-P|
-	//  I(i,j) = traceRay(scene, P, d)
-
 	traceSetup(w, h);
 
-	#pragma omp parallel
-	{
 	for (int r = 0; r < w; r++) {
 		for (int c = 0; c < h; c++) {
 			tracePixel(r, c);
 		}
-	}
 	}
 }
 
@@ -342,4 +252,3 @@ void RayTracer::setPixel(int i, int j, glm::dvec3 color)
 	pixel[1] = (int)( 255.0 * color[1]);
 	pixel[2] = (int)( 255.0 * color[2]);
 }
-

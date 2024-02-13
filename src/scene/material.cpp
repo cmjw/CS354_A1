@@ -45,40 +45,7 @@ glm::dvec3 Material::shade(Scene* scene, const ray& r, const isect& i) const
 	// 		.
 	// 		.
 	// }
-
-	glm::dvec3 Q = r.at(i.getT());
-	glm::dvec3 I = ke(i) + ka(i) * scene->ambient();
-
-	glm::dvec3 isect = r.at(i.getT());
-
-	glm::dvec3 color = glm::dvec3(0, 0, 0);
-
-	for (const auto& pLight : scene->getAllLights()) {
-		// Light has type unique_ptr<Light>
-		glm::dvec3 attenuation = pLight->distanceAttenuation(Q) * pLight->shadowAttenuation(r, Q);
-		
-		double direction = dot(pLight->getDirection(Q), i.getN());
-
-		glm::dvec3 Ii = pLight->getColor();
-		
-		// diffuse term : kd * Ii max(L dot N, 0)
-		double LdotN = dot(pLight->getDirection(isect), i.getN());
-
-		glm::dvec3 diffuse = kd(i) * Ii * max(LdotN, 0.0);
-
-		// spec term : ks Ii max(R dot V, 0) ^ n
-		glm::dvec3 ri = -1.0 * pLight->getDirection(isect);
-		glm::dvec3 R = ri - (2.0 * i.getN() * glm::dot(ri, i.getN()));
-		glm::dvec3 V = -1.0 * r.getDirection();
-		double n = shininess(i);
-		glm::dvec3 spec = ks(i) * Ii * pow (max(glm::dot(R, V), 0.0), n);
-
-		// I = I + atten * (diffuse + spec)
-		I += attenuation * (diffuse + spec);
-	}
-
-	return I;
-	//return kd(i);
+	return kd(i);
 }
 
 TextureMap::TextureMap(string filename)
@@ -106,37 +73,6 @@ glm::dvec3 TextureMap::getMappedValue(const glm::dvec2& coord) const
 	// and use these to perform bilinear interpolation
 	// of the values.
 
-	double w = (double) getWidth();
-	double h = (double) getHeight();
-
-	double u = coord.x * w - 1;
-	double v = coord.y * h - 1;
-
-	double fu = floor(u);
-	double cu = fu + 1;
-	
-	double fv = floor(v);
-	double cv = fv + 1;
-
-	glm::dvec2 upperLeft  (fu, cv);
-	glm::dvec2 upperRight (cu, cv);
-	glm::dvec2 lowerLeft  (fu, fv);
-	glm::dvec2 lowerRight (cu, fv);
-
-	// bilinear interpolation
-	glm::dvec3 q11 = getPixelAt( (int) upperLeft.x,  (int) upperLeft.y );
-	glm::dvec3 q12 = getPixelAt( (int) upperRight.x, (int) upperRight.y );
-	glm::dvec3 q21 = getPixelAt( (int) lowerLeft.x,  (int) lowerLeft.y );
-	glm::dvec3 q22 = getPixelAt( (int) lowerRight.x, (int) lowerRight.y );
-
-	glm::dvec3 r1 = ( (lowerRight.x - u) / (lowerRight.x - lowerLeft.x) ) * q11 + ( (u - lowerLeft.x) / (lowerRight.x - lowerLeft.x) ) * q21;
-
-	glm::dvec3 r2 = ( (upperRight.x - u) / (upperRight.x - upperLeft.x) ) * q12 + ( (u - upperLeft.x) / (upperRight.x - upperLeft.x) ) * q22;
-
-	glm::dvec3 colorC = ( (upperLeft.y - v) / (upperLeft.y - lowerLeft.y) ) * r1 + ( (v - lowerLeft.x) / (upperLeft.x - lowerLeft.x) ) * r2;
-
-	return colorC;
-
 	return glm::dvec3(1, 1, 1);
 }
 
@@ -147,18 +83,7 @@ glm::dvec3 TextureMap::getPixelAt(int x, int y) const
 	// In order to add texture mapping support to the
 	// raytracer, you need to implement this function.
 
-	x = (x >= width) ? -x : x;
-	y = (y >= height) ? -y : y;
-
-	int p = 3 * (y * width + x);
-	
-	double pixels = 255;
-
-	glm::dvec3 result ((double) data[p], (double) data[p + 1], (double) data[p + 2]);
-
-	return result / pixels;
-
-	//return glm::dvec3(1, 1, 1);
+	return glm::dvec3(1, 1, 1);
 }
 
 glm::dvec3 MaterialParameter::value(const isect& is) const
