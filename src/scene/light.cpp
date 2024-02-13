@@ -72,7 +72,7 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 	// YOUR CODE HERE:
 	// You should implement shadow-handling code here.
 
-	std::cout << "Point Light Shadow Attenuation" << std::endl;
+	//std::cout << "Point Light Shadow Attenuation" << std::endl;
 
 	glm::dvec3 d = glm::normalize((r.getPosition() - p));
 	isect i;
@@ -81,7 +81,7 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 
 	if (!(scene->intersect(shadowRay, i))) {
 		// no intersection, no shadow
-		std::cout << "No intersection" << std::endl;
+		//std::cout << "No intersection" << std::endl;
 
 		return glm::dvec3(1, 1, 1);
 	}
@@ -91,7 +91,7 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 	double qLen = glm::distance(p, Q);
 	double lightLen = glm::distance(p, position);
 
-	std::cout << "q and light" << qLen << " " << lightLen << std::endl;
+	//std::cout << "q and light" << qLen << " " << lightLen << std::endl;
 
 	if (qLen < lightLen) {
 		return glm::dvec3(0, 0, 0);

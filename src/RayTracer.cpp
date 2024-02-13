@@ -26,7 +26,7 @@ extern TraceUI* traceUI;
 // Use this variable to decide if you want to print out
 // debugging messages.  Gets set in the "trace single ray" mode
 // in TraceGLWindow, for example.
-bool debugMode = false;
+bool debugMode = true;
 
 // Trace a top-level ray through pixel(i,j), i.e. normalized window coordinates (x,y),
 // through the projection plane, and out into the scene.  All we do is
@@ -93,6 +93,31 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 
 		const Material& m = i.getMaterial();
 		colorC = m.shade(scene.get(), r, i);
+
+		glm::dvec3 Q = r.at(i.getT());
+		glm::dvec3 L = -1.0 * r.getDirection();
+		glm::dvec3 N = i.getN();
+		t = i.getT();
+		glm::dvec3 kr = m.kr(i);
+		glm::dvec3 kt = m.kt(i);
+		double t_reflect = 0;
+		
+		bool enteringObject = glm::dot(glm::normalize(r.getDirection()), glm::normalize(i.getN())) < 0;
+
+		// reflection
+		if (m.Refl()) {
+			if (debugMode) {
+				std::cout << "Reflection" << endl;
+			}
+			glm::dvec3 p = r.at(i) + RAY_EPSILON * N;
+
+			glm::dvec3 reflectedDirection = 2.0 * glm::dot(L, N) * N - L;
+
+			ray reflectedRay = ray(p, reflectedDirection, glm::dvec3(1,1,1), ray::REFLECTION);
+	
+			colorC += kr * traceRay(reflectedRay, thresh, depth - 1, t_reflect);
+		}
+
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
