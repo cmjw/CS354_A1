@@ -19,6 +19,14 @@ glm::dvec3 DirectionalLight::shadowAttenuation(const ray& r, const glm::dvec3& p
 {
 	// YOUR CODE HERE:
 	// You should implement shadow-handling code here.
+
+	ray shadowRay = ray(p, getDirection(p), glm::dvec3(1, 1, 1), ray::SHADOW);
+	isect i;
+
+	if (scene->intersect(shadowRay, i)) {
+		return glm::dvec3(0, 0, 0);
+	}
+
 	return glm::dvec3(1.0, 1.0, 1.0);
 }
 
@@ -40,6 +48,8 @@ double PointLight::distanceAttenuation(const glm::dvec3& P) const
 	// You'll need to modify this method to attenuate the intensity 
 	// of the light based on the distance between the source and the 
 	// point P.  For now, we assume no attenuation and just return 1.0
+
+
 	return 1.0;
 }
 
@@ -58,6 +68,17 @@ glm::dvec3 PointLight::shadowAttenuation(const ray& r, const glm::dvec3& p) cons
 {
 	// YOUR CODE HERE:
 	// You should implement shadow-handling code here.
+
+	// glm::dvec3 d = glm::normalize((r.getPosition() - p));
+	// isect i;
+
+	// ray shadowRay = ray(p, d, glm::dvec3(1, 1, 1), ray::SHADOW);
+
+	// if (!(scene->intersect(shadowRay, i))) {
+	// 	// no intersection, no shadow
+	// 	return glm::dvec3(1, 1, 1);
+	// }
+
 	return glm::dvec3(1,1,1);
 }
 
