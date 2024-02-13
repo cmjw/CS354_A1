@@ -136,23 +136,26 @@ glm::dvec3 RayTracer::traceRay(ray& r, const glm::dvec3& thresh, int depth, doub
 				n_t = indexOfAir;
 			}
 
-			double TIR = 1.0 - (glm::pow(n_i / n_t, 2) * (1.0 - glm::pow( glm::dot(N, r.getDirection()), 2) ) );
+			// bool ktGTZ = (m.kt(i)[0] > 0) && (m.kt(i)[1] > 0) && (m.kt(i)[2] > 0);
 
-			bool ktGTZ = (m.kt(i)[0] > 0) && (m.kt(i)[1] > 0) && (m.kt(i)[2] > 0);
+			// if (debugMode) {
+			// 	std::cout << "Entering: " << enteringObject << " TIR :" << TIR << endl;
+			// }
 
-			if (debugMode) {
-				std::cout << "Entering: " << enteringObject << " TIR :" << TIR << endl;
-			}
+			// if (ktGTZ && TIR > 0 && i.getT() < RAY_EPSILON) {
+			// 	glm::dvec3 refractedDirection = glm::normalize(glm::refract(r.getDirection(), N, n_i / n_t));
 
-			if (ktGTZ && TIR > 0 && i.getT() < RAY_EPSILON) {
-				glm::dvec3 refractedDirection = glm::normalize(glm::refract(r.getDirection(), N, n_i / n_t));
+			// 	ray refractedRay = ray(Q, refractedDirection, glm::dvec3(0, 0, 0), ray::REFRACTION);
 
-				ray refractedRay = ray(Q, refractedDirection, glm::dvec3(0, 0, 0), ray::REFRACTION);
+			// 	double ze = 0;
 
-				double ze = 0;
+			// 	colorC += m.kt(i) * traceRay(refractedRay, thresh, depth - 1, ze);
+			// }
 
-				colorC += m.kt(i) * traceRay(refractedRay, thresh, depth - 1, ze);
-			}
+			// cosI = N * I
+			//double cosI = (i.getN() * L);
+
+
 		}
 		
 
