@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <cmath>
 #include "../ui/TraceUI.h"
+
+#include <iostream>
+
 extern TraceUI* traceUI;
 
 using namespace std;
@@ -97,7 +100,41 @@ bool TrimeshFace::intersectLocal(ray& r, isect& i) const
 	//
 	// FIXME: Add ray-trimesh intersection
 
-	return false;
+
+	glm::dvec3 a = parent->vertices[ids[0]];
+	glm::dvec3 b = parent->vertices[ids[1]];
+	glm::dvec3 c = parent->vertices[ids[2]];
+
+	glm::dvec3 p = r.getPosition();
+	glm::dvec3 d = r.getDirection();
+	double t = i.getT();
+
+	glm::dvec3 q = p + d * t;
+
+	glm::dvec3 N = glm::cross((a - c), (b - c));
+
+	glm::dvec3 bary1 = glm::cross((b - a), (q - a));
+	glm::dvec3 bary2 = glm::cross((c - b), (q - b));
+	glm::dvec3 bary3 = glm::cross((a - c), (q - c));
+
+	if (glm::dot(N, bary1) < 0 || glm::dot(N, bary2) < 0 || glm::dot(N, bary3) < 0) {
+		return false;
+		// no intersection
+	}
+
+	double u = glm::length(bary2) / glm::length(N);
+	double v = glm::length(bary3) / glm::length(N);
+
+	glm::dvec3 bary;
+	bary.x = u;
+	bary.y = v;
+	bary.z = 1.0 - u - v;
+
+	i.setBary(bary);
+
+	return true;
+
+	//return false;
 }
 
 // Once all the verts and faces are loaded, per vertex normals can be
